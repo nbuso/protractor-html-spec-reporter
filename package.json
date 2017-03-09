@@ -1,11 +1,11 @@
 {
-  "name": "jasmine-spec-reporter",
-  "version": "3.2.0",
-  "description": "Spec reporter for jasmine behavior-driven development framework",
+  "name": "protractor-html-spec-reporter",
+  "version": "0.0.1",
+  "description": "HTML Spec reporter for Protractor/jasmine behavior-driven development framework. Based on 'jasmine-spec-reporter'",
   "main": "built/main.js",
   "types": "built/main.d.ts",
   "scripts": {
-    "prepublish": "tsc",
+    "prepublish": "tsc && copy assets/* built/",
     "pretest": "tsc && tsc -p spec/tsconfig.json",
     "test": "jasmine",
     "test:integration": "npm run pretest && npm run examples:update && jasmine JASMINE_CONFIG_PATH=spec/support/jasmine-integration.json",
@@ -26,10 +26,6 @@
       "spec"
     ]
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/bcaudan/jasmine-spec-reporter"
-  },
   "keywords": [
     "jasmine",
     "reporter",
@@ -37,12 +33,9 @@
     "spec",
     "protractor"
   ],
-  "author": "Bastien Caudan",
+  "author": "Nicola Buso",
   "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/bcaudan/jasmine-spec-reporter/issues"
-  },
-  "homepage": "https://github.com/bcaudan/jasmine-spec-reporter",
+  "bugs": {},
   "dependencies": {
     "colors": "1.1.2"
   },
@@ -51,6 +44,7 @@
     "@types/jasmine": "2.5.41",
     "@types/node": "7.0.0",
     "codecov": "1.0.1",
+    "copy": "^0.3.0",
     "diff": "3.2.0",
     "jasmine": "2.5.3",
     "jasmine-core": "2.5.2",

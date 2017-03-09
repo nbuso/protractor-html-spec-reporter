@@ -3,27 +3,35 @@ import { CustomReporterResult } from "./custom-reporter-result";
 import { ColorsDisplay } from "./display/colors-display";
 import { DisplayProcessor } from "./display/display-processor";
 import { DefaultProcessor } from "./display/processors/default-processor";
-import { SpecColorsProcessor } from "./display/processors/spec-colors-processor";
+import { HtmlProcessor } from "./display/processors/html-processor";
+// import { SpecColorsProcessor } from "./display/processors/spec-colors-processor";
 import { SpecDurationsProcessor } from "./display/processors/spec-durations-processor";
-import { SpecPrefixesProcessor } from "./display/processors/spec-prefixes-processor";
+import { SpecStatusProcessor } from "./display/processors/spec-status-processor";
+// import { SpecPrefixesProcessor } from "./display/processors/spec-prefixes-processor";
 import { SuiteNumberingProcessor } from "./display/processors/suite-numbering-processor";
+import { SummaryProcessor } from "./display/processors/summary-processor";
 import { ExecutionMetrics } from "./execution-metrics";
 import SuiteInfo = jasmine.SuiteInfo;
+import RunDetails = jasmine.RunDetails;
+import fs = require('fs');
 
-type ProcessFunction = (displayProcessor: DisplayProcessor, object: ProcessObject, log: String) => String;
-type ProcessObject = SuiteInfo | CustomReporterResult;
+type ProcessFunction = (displayProcessor: DisplayProcessor, object: ProcessObject,
+    log: String, metrics: ExecutionMetrics) => String;
+type ProcessObject = SuiteInfo | CustomReporterResult | RunDetails;
 
 export class ExecutionDisplay {
     private static initProcessors(configuration: Configuration): DisplayProcessor[] {
         const displayProcessors: DisplayProcessor[] = [
             new DefaultProcessor(configuration),
-            new SpecPrefixesProcessor(configuration),
-            new SpecColorsProcessor(configuration),
+            // new SpecPrefixesProcessor(configuration),
+            // new SpecColorsProcessor(configuration),
+
         ];
 
         if (configuration.spec.displayDuration) {
             displayProcessors.push(new SpecDurationsProcessor(configuration));
         }
+        displayProcessors.push(new SpecStatusProcessor(configuration));
 
         if (configuration.suite.displayNumber) {
             displayProcessors.push(new SuiteNumberingProcessor(configuration));
@@ -34,6 +42,10 @@ export class ExecutionDisplay {
                 displayProcessors.push(new Processor(configuration));
             });
         }
+        displayProcessors.push(new SummaryProcessor(configuration));
+
+        // the HtmlProcessor needs to be last because it decorate the all message with html
+        displayProcessors.push(new HtmlProcessor(configuration));
 
         return displayProcessors;
     }
@@ -65,6 +77,7 @@ export class ExecutionDisplay {
         ColorsDisplay.init(this.configuration);
         this.displayProcessors = ExecutionDisplay.initProcessors(this.configuration);
         this.hasCustomDisplaySpecStarted = ExecutionDisplay.hasCustomDisplaySpecStarted(this.displayProcessors);
+        this.prepareDestination();
     }
 
     public jasmineStarted(suiteInfo: SuiteInfo): void {
@@ -73,27 +86,36 @@ export class ExecutionDisplay {
         });
     }
 
-    public summary(metrics: ExecutionMetrics): void {
-        const pluralizedSpec: string = (metrics.totalSpecsDefined === 1 ? " spec" : " specs");
-        const execution: string = `Executed ${metrics.executedSpecs} of ${metrics.totalSpecsDefined}${pluralizedSpec}`;
-        const successful: string = (metrics.failedSpecs === 0) ? " SUCCESS" : "";
-        const failed: string = (metrics.failedSpecs > 0) ? ` (${metrics.failedSpecs} FAILED)` : "";
-        const pending: string = (metrics.pendingSpecs > 0) ? ` (${metrics.pendingSpecs} PENDING)` : "";
-        const skipped: string = (metrics.skippedSpecs > 0) ? ` (${metrics.skippedSpecs} SKIPPED)` : "";
-        const duration: string = this.configuration.summary.displayDuration ? ` in ${metrics.duration}` : "";
+    public summary(runDetails: RunDetails, metrics: ExecutionMetrics): void {
 
-        this.resetIndent();
-        this.newLine();
-        if (this.configuration.summary.displaySuccessful && metrics.successfulSpecs > 0) {
-            this.successesSummary();
-        }
-        if (this.configuration.summary.displayFailed && metrics.failedSpecs > 0) {
-            this.failuresSummary();
-        }
-        if (this.configuration.summary.displayPending && metrics.pendingSpecs > 0) {
-            this.pendingsSummary();
-        }
-        this.log(execution + successful.successful + failed.failed + pending.pending + skipped + duration + ".");
+        this.process(
+            runDetails,
+            (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: String,
+              metricsObject: ExecutionMetrics): String => {
+
+                return displayProcessor.displaySummary(object, log, metricsObject);
+            },
+            metrics
+        );
+
+        // this.resetIndent();
+        // this.newLine();
+        // if (this.configuration.summary.displaySuccessful && metrics.successfulSpecs > 0) {
+        //     this.successesSummary();
+        // }
+        // if (this.configuration.summary.displayFailed && metrics.failedSpecs > 0) {
+        //     this.failuresSummary();
+        // }
+        // if (this.configuration.summary.displayPending && metrics.pendingSpecs > 0) {
+        //     this.pendingsSummary();
+        // }
+        //
+        this.process(
+          runDetails,
+          (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: String): String => {
+            return displayProcessor.displayJasmineDone(object, log);
+          }
+        );
 
         if (metrics.random) {
             this.log(`Randomized with seed ${metrics.seed}.`);
@@ -110,6 +132,15 @@ export class ExecutionDisplay {
                 }
             );
         }
+    }
+
+    public specDone(result: CustomReporterResult): void {
+      this.process(
+          result,
+          (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: String): String => {
+              return displayProcessor.displaySpecDone(object, log);
+          }
+      );
     }
 
     public successful(result: CustomReporterResult): void {
@@ -174,70 +205,70 @@ export class ExecutionDisplay {
         this.decreaseIndent();
     }
 
-    private successesSummary(): void {
-        this.log("**************************************************");
-        this.log("*                   Successes                    *");
-        this.log("**************************************************");
-        this.newLine();
-        for (let i: number = 0; i < this.successfulSpecs.length; i++) {
-            this.successfulSummary(this.successfulSpecs[i], i + 1);
-            this.newLine();
-        }
-        this.newLine();
-        this.resetIndent();
-    }
+    // private successesSummary(): void {
+    //     this.log("**************************************************");
+    //     this.log("*                   Successes                    *");
+    //     this.log("**************************************************");
+    //     this.newLine();
+    //     for (let i: number = 0; i < this.successfulSpecs.length; i++) {
+    //         this.successfulSummary(this.successfulSpecs[i], i + 1);
+    //         this.newLine();
+    //     }
+    //     this.newLine();
+    //     this.resetIndent();
+    // }
 
-    private successfulSummary(spec: CustomReporterResult, index: number): void {
-        this.log(`${index}) ${spec.fullName}`);
-    }
+    // private successfulSummary(spec: CustomReporterResult, index: number): void {
+    //     this.log(`${index}) ${spec.fullName}`);
+    // }
 
-    private failuresSummary(): void {
-        this.log("**************************************************");
-        this.log("*                    Failures                    *");
-        this.log("**************************************************");
-        this.newLine();
-        for (let i: number = 0; i < this.failedSpecs.length; i++) {
-            this.failedSummary(this.failedSpecs[i], i + 1);
-            this.newLine();
-        }
-        this.newLine();
-        this.resetIndent();
-    }
+    // private failuresSummary(): void {
+    //     this.log("**************************************************");
+    //     this.log("*                    Failures                    *");
+    //     this.log("**************************************************");
+    //     this.newLine();
+    //     for (let i: number = 0; i < this.failedSpecs.length; i++) {
+    //         this.failedSummary(this.failedSpecs[i], i + 1);
+    //         this.newLine();
+    //     }
+    //     this.newLine();
+    //     this.resetIndent();
+    // }
 
-    private failedSummary(spec: CustomReporterResult, index: number): void {
-        this.log(`${index}) ${spec.fullName}`);
-        if (this.configuration.summary.displayErrorMessages) {
-            this.increaseIndent();
-            this.process(
-                spec,
-                (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: String): String => {
-                    return displayProcessor.displaySummaryErrorMessages(object, log);
-                }
-            );
-            this.decreaseIndent();
-        }
-    }
+    // private failedSummary(spec: CustomReporterResult, index: number): void {
+    //     this.log(`${index}) ${spec.fullName}`);
+    //     if (this.configuration.summary.displayErrorMessages) {
+    //         this.increaseIndent();
+    //         this.process(
+    //             spec,
+    //             (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: String): String => {
+    //                 return displayProcessor.displaySummaryErrorMessages(object, log);
+    //             }
+    //         );
+    //         this.decreaseIndent();
+    //     }
+    // }
 
-    private pendingsSummary(): void {
-        this.log("**************************************************");
-        this.log("*                    Pending                     *");
-        this.log("**************************************************");
-        this.newLine();
-        for (let i: number = 0; i < this.pendingSpecs.length; i++) {
-            this.pendingSummary(this.pendingSpecs[i], i + 1);
-            this.newLine();
-        }
-        this.newLine();
-        this.resetIndent();
-    }
+    // private pendingsSummary(): void {
+    //     this.log("**************************************************");
+    //     this.log("*                    Pending                     *");
+    //     this.log("**************************************************");
+    //     this.newLine();
+    //     for (let i: number = 0; i < this.pendingSpecs.length; i++) {
+    //         this.pendingSummary(this.pendingSpecs[i], i + 1);
+    //         this.newLine();
+    //     }
+    //     this.newLine();
+    //     this.resetIndent();
+    // }
 
-    private pendingSummary(spec: CustomReporterResult, index: number) {
-        this.log(`${index}) ${spec.fullName}`);
-        this.increaseIndent();
-        const pendingReason = spec.pendingReason ? spec.pendingReason : "No reason given";
-        this.log(pendingReason.pending);
-        this.resetIndent();
-    }
+    // private pendingSummary(spec: CustomReporterResult, index: number) {
+    //     this.log(`${index}) ${spec.fullName}`);
+    //     this.increaseIndent();
+    //     const pendingReason = spec.pendingReason ? spec.pendingReason : "No reason given";
+    //     this.log(pendingReason.pending);
+    //     this.resetIndent();
+    // }
 
     private ensureSuiteDisplayed(): void {
         if (this.suiteHierarchy.length !== 0) {
@@ -267,10 +298,10 @@ export class ExecutionDisplay {
         this.increaseIndent();
     }
 
-    private process(object: ProcessObject, processFunction: ProcessFunction): void {
+    private process(object: ProcessObject, processFunction: ProcessFunction, metrics?: ExecutionMetrics): void {
         let log: String = "";
         this.displayProcessors.forEach((displayProcessor: DisplayProcessor) => {
-            log = processFunction(displayProcessor, object, log);
+            log = processFunction(displayProcessor, object, log, metrics);
         });
         this.log(log);
     }
@@ -286,6 +317,10 @@ export class ExecutionDisplay {
         stuff.split("\n").forEach((line: String) => {
             console.log(line !== "" ? this.currentIndent + line : line);
         });
+        fs.appendFileSync(
+          this.configuration.destination.folder + this.configuration.destination.fileName,
+          stuff
+        );
         this.lastWasNewLine = false;
     }
 
@@ -307,4 +342,28 @@ export class ExecutionDisplay {
     private decreaseIndent(): void {
         this.currentIndent = this.currentIndent.substr(0, this.currentIndent.length - this.indent.length);
     }
+
+    private prepareDestination() {
+      const destFolder = this.configuration.destination.folder;
+      // const destFilename = this.configuration.destination.folder
+      //   + this.configuration.destination.fileName;
+      if (fs.accessSync(destFolder)) {
+        fs.mkdir(destFolder);
+      }
+      // fs.open(destFilename, "w", (err, fd) => {
+      //   if (err) { // exists delete it
+      //     fs.unlink(destFilename);
+      //   }
+      // });
+      // cleanup folder
+      const files = fs.readdirSync(destFolder);
+      files.forEach(file => {
+          fs.unlink(destFolder + file);
+      });
+      fs.createReadStream(`${__dirname}/assets/reports.css`)
+        .pipe(fs.createWriteStream(`${destFolder}/reports.css`));
+      fs.createReadStream(`${__dirname}/assets/scripts.js`)
+        .pipe(fs.createWriteStream(`${destFolder}/scripts.js`));
+    }
+
 }

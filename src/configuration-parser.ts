@@ -14,13 +14,17 @@ export class ConfigurationParser {
             successful: "green",
         },
         customProcessors: [],
+        destination: {
+          fileName: "reports.html",
+          folder: "target/html-report/"
+        },
         prefixes: {
             failed: ConfigurationParser.isWindows ? "\u00D7 " : "✗ ",
             pending: "* ",
             successful: ConfigurationParser.isWindows ? "\u221A " : "✓ ",
         },
         spec: {
-            displayDuration: false,
+            displayDuration: true,
             displayErrorMessages: true,
             displayFailed: true,
             displayPending: false,

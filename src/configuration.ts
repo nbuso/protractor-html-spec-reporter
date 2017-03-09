@@ -1,6 +1,10 @@
 import { DisplayProcessor } from "./display/display-processor";
 
 export class Configuration {
+    public destination?: {
+      folder: string,
+      fileName: string
+    };
     public suite?: {
         /**
          * display each suite number (hierarchical)

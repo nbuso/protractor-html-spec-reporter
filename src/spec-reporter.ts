@@ -28,7 +28,7 @@ export class SpecReporter implements CustomReporter {
 
     public jasmineDone(runDetails: RunDetails): void {
         this.metrics.stop(runDetails);
-        this.display.summary(this.metrics);
+        this.display.summary(runDetails, this.metrics);
         this.finished = true;
     }
 
@@ -57,5 +57,6 @@ export class SpecReporter implements CustomReporter {
             this.metrics.failedSpecs++;
             this.display.failed(result);
         }
+        this.display.specDone(result);
     }
 }

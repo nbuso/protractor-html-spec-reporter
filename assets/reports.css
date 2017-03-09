@@ -1,0 +1,39 @@
+table {
+    background-color: whitesmoke;
+    margin-bottom: 2em;
+    min-width: 50%;
+    border-spacing: 0px;
+}
+
+table caption {
+    background-color: #59ffff
+}
+
+table thead, table thead:hover {
+    background-color: #ffe79e
+}
+
+tr {
+    margin: 5px;
+    border: 5px solid black !important;
+}
+
+table td, table caption {
+    padding: 0.4em;
+}
+
+table td.status-success {
+    background-color: #9dea9e
+}
+
+table td.status-failed {
+    background-color: #ff4a4a;
+}
+
+table tbody tr:hover td {
+    background-color: rgba(132, 132, 132, 0.15);
+}
+
+.hide {
+  display: none;
+}

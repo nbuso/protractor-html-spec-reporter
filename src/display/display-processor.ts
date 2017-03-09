@@ -1,5 +1,6 @@
 import { Configuration } from "../configuration";
 import { CustomReporterResult } from "../custom-reporter-result";
+import { ExecutionMetrics } from '../execution-metrics';
 import SuiteInfo = jasmine.SuiteInfo;
 
 export class DisplayProcessor {
@@ -9,7 +10,7 @@ export class DisplayProcessor {
         this.configuration = configuration;
     }
 
-    public displayJasmineStarted(info: SuiteInfo, log: String): String {
+    public displayJasmineStarted(info?: SuiteInfo, log?: String): String {
         return log;
     }
 
@@ -19,6 +20,10 @@ export class DisplayProcessor {
 
     public displaySpecStarted(spec: CustomReporterResult, log: String): String {
         return log;
+    }
+
+    public displaySpecDone(spec: CustomReporterResult, log: String): String {
+      return log;
     }
 
     public displaySuccessfulSpec(spec: CustomReporterResult, log: String): String {
@@ -39,5 +44,13 @@ export class DisplayProcessor {
 
     public displayPendingSpec(spec: CustomReporterResult, log: String): String {
         return log;
+    }
+
+    public displaySummary(spec: CustomReporterResult, log: String, metrics: ExecutionMetrics): String {
+      return log;
+    }
+
+    public displayJasmineDone(spec: CustomReporterResult, log: String): String {
+      return log;
     }
 }

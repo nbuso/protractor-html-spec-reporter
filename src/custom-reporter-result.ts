@@ -1,3 +1,4 @@
 export interface CustomReporterResult extends jasmine.CustomReporterResult {
-    duration?: string;
+  duration?: string;
+  filename?: any;
 }
