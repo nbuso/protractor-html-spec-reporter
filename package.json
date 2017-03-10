@@ -1,6 +1,6 @@
 {
   "name": "protractor-html-spec-reporter",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "HTML Spec reporter for Protractor/jasmine behavior-driven development framework. Based on 'jasmine-spec-reporter'",
   "main": "built/main.js",
   "types": "built/main.d.ts",
