@@ -37,3 +37,7 @@ table tbody tr:hover td {
 .hide {
   display: none;
 }
+
+table.summary tr.total {
+  font-weight: bold;
+}

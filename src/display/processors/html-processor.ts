@@ -1,12 +1,12 @@
 import { browser } from 'protractor';
 import { CustomReporterResult } from "../../custom-reporter-result";
 import { DisplayProcessor } from "../display-processor";
-import fs = require('fs');
-
+import fs = require("fs");
+import path = require("path");
 
 export class HtmlProcessor extends DisplayProcessor {
 
-    private static decorateSpec(spec: CustomReporterResult, log: String, link?: string): String {
+    private static decorateSpec(spec: CustomReporterResult, log: String, link?: String): String {
       let toReturn = `<td></td><td class="description">`;
       if (link) {
         const screenshotFilename = link;
@@ -19,14 +19,21 @@ export class HtmlProcessor extends DisplayProcessor {
     }
 
     public displayJasmineStarted(): String {
+      const htmlStyleSheetsLinks = this.generateStylesheetLinks();
       return `
 <html>
   <head>
-    <title>TDD test reports</title>
+    <title>${this.configuration.title}</title>
     <link rel="stylesheet" type="text/css" href="reports.css">
+    ${htmlStyleSheetsLinks}
     <script defer="defer" src="scripts.js"></script>
   </head>
   <body>
+  <h2>${this.configuration.title}</h2>
+  <ul>
+  <li><a href="#suite-table">Test report</a></li>
+  <li><a href="#summary-table">Summary report</a></li>
+  </ul>
   <table id="suites-table">
   <caption>Test Suites report</caption>
   <thead>
@@ -57,7 +64,7 @@ export class HtmlProcessor extends DisplayProcessor {
 
     public displayFailedSpec(spec: CustomReporterResult, log: String): String {
       this.getScreenshot(spec);
-      return HtmlProcessor.decorateSpec(spec, log, true);
+      return HtmlProcessor.decorateSpec(spec, log, this.getScreenshot(spec));
     }
 
     public displayPendingSpec(spec: CustomReporterResult, log: String): String {
@@ -79,8 +86,8 @@ export class HtmlProcessor extends DisplayProcessor {
     private getScreenshot(spec: CustomReporterResult): String {
       const cfg = this.configuration;
       const scrFilename = "xxxxxxxx-xxxxxxxx-xxxxxxxx.png".replace(/x/g, function(c) {
-        const r = Math.random() * 16 | 0, v = c == 'x'? r : c;
-        return v.toString(16);
+        const r = Math.random() * 16 | 0;
+        return c === "x" ? r.toString(16) : c;
       });
       browser.takeScreenshot().then(function(png) {
         const fileNamePath = cfg.destination.folder
@@ -90,5 +97,20 @@ export class HtmlProcessor extends DisplayProcessor {
         stream.end();
       });
       return scrFilename;
+    }
+
+    private generateStylesheetLinks(): String {
+      const styleLinks: string[] = [];
+      this.configuration.customStylesheets.forEach(function(s) {
+        if (s) {
+          styleLinks.push(`<link rel="stylesheet" type="text/css" href="${s}">`);
+        }
+      });
+      this.configuration.importStylesheets.forEach(function(s) {
+        if (s) {
+          styleLinks.push(`<link rel="stylesheet" type="text/css" href="${s.substr(s.lastIndexOf(path.sep) + 1)}">`);
+        }
+      });
+      return styleLinks.join("\n");
     }
 }

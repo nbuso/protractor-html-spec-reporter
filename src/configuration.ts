@@ -42,6 +42,12 @@ export class Configuration {
          */
         displayDuration?: boolean;
     };
+    public stacktrace?: {
+        /**
+         * Customize stacktrace filtering
+         */
+        filter?(stacktrace: String): String;
+    };
     public summary?: {
         /**
          * display error messages for each failed assertion
@@ -74,52 +80,9 @@ export class Configuration {
         displayDuration?: boolean;
     };
     /**
-     * Colors are displayed in the console via colors package: https://github.com/Marak/colors.js.
-     * You can see all available colors on the project page.
+     * Title used in the HTML report
      */
-    public colors?: {
-        /**
-         * enable colors
-         */
-        enabled?: boolean;
-
-        /**
-         * color for successful spec
-         */
-        successful?: string;
-
-        /**
-         * color for failing spec
-         */
-        failed?: string;
-
-        /**
-         * color for pending spec
-         */
-        pending?: string
-    };
-    public prefixes?: {
-        /**
-         * prefix for successful spec
-         */
-        successful?: string;
-
-        /**
-         * prefix for failing spec
-         */
-        failed?: string;
-
-        /**
-         * prefix for pending spec
-         */
-        pending?: string
-    };
-    public stacktrace?: {
-        /**
-         * Customize stacktrace filtering
-         */
-        filter?(stacktrace: String): String;
-    };
+    public title?: string;
     /**
      * list of display processor to customize output
      * see https://github.com/bcaudan/jasmine-spec-reporter/blob/master/docs/customize-output.md
@@ -129,4 +92,14 @@ export class Configuration {
      * options for custom processors
      */
     public customOptions?: any;
+    /**
+     * List of custom stylesheets to in the html. These stylesheets are absolute URL, if you want to import
+     * a stylesheet from your project use 'importStylesheets'
+     */
+    public customStylesheets?: string[];
+    /**
+     * List of stylesheet path relative to the project folder that will be imported in the destination folder
+     * and added to the html
+     */
+    public importStylesheets?: string[];
 }

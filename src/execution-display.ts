@@ -1,6 +1,5 @@
 import { Configuration } from "./configuration";
 import { CustomReporterResult } from "./custom-reporter-result";
-import { ColorsDisplay } from "./display/colors-display";
 import { DisplayProcessor } from "./display/display-processor";
 import { DefaultProcessor } from "./display/processors/default-processor";
 import { HtmlProcessor } from "./display/processors/html-processor";
@@ -13,7 +12,8 @@ import { SummaryProcessor } from "./display/processors/summary-processor";
 import { ExecutionMetrics } from "./execution-metrics";
 import SuiteInfo = jasmine.SuiteInfo;
 import RunDetails = jasmine.RunDetails;
-import fs = require('fs');
+import fs = require("fs");
+import path = require("path");
 
 type ProcessFunction = (displayProcessor: DisplayProcessor, object: ProcessObject,
     log: String, metrics: ExecutionMetrics) => String;
@@ -74,13 +74,13 @@ export class ExecutionDisplay {
     private displayProcessors: DisplayProcessor[];
 
     constructor(private configuration: Configuration) {
-        ColorsDisplay.init(this.configuration);
         this.displayProcessors = ExecutionDisplay.initProcessors(this.configuration);
         this.hasCustomDisplaySpecStarted = ExecutionDisplay.hasCustomDisplaySpecStarted(this.displayProcessors);
         this.prepareDestination();
     }
 
     public jasmineStarted(suiteInfo: SuiteInfo): void {
+      console.log(`jasmineStarted(): suiteInfo => ${JSON.stringify(suiteInfo)}`);
         this.process(suiteInfo, (displayProcessor: DisplayProcessor, object: SuiteInfo, log: String): String => {
             return displayProcessor.displayJasmineStarted(object, log);
         });
@@ -98,18 +98,6 @@ export class ExecutionDisplay {
             metrics
         );
 
-        // this.resetIndent();
-        // this.newLine();
-        // if (this.configuration.summary.displaySuccessful && metrics.successfulSpecs > 0) {
-        //     this.successesSummary();
-        // }
-        // if (this.configuration.summary.displayFailed && metrics.failedSpecs > 0) {
-        //     this.failuresSummary();
-        // }
-        // if (this.configuration.summary.displayPending && metrics.pendingSpecs > 0) {
-        //     this.pendingsSummary();
-        // }
-        //
         this.process(
           runDetails,
           (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: String): String => {
@@ -205,71 +193,6 @@ export class ExecutionDisplay {
         this.decreaseIndent();
     }
 
-    // private successesSummary(): void {
-    //     this.log("**************************************************");
-    //     this.log("*                   Successes                    *");
-    //     this.log("**************************************************");
-    //     this.newLine();
-    //     for (let i: number = 0; i < this.successfulSpecs.length; i++) {
-    //         this.successfulSummary(this.successfulSpecs[i], i + 1);
-    //         this.newLine();
-    //     }
-    //     this.newLine();
-    //     this.resetIndent();
-    // }
-
-    // private successfulSummary(spec: CustomReporterResult, index: number): void {
-    //     this.log(`${index}) ${spec.fullName}`);
-    // }
-
-    // private failuresSummary(): void {
-    //     this.log("**************************************************");
-    //     this.log("*                    Failures                    *");
-    //     this.log("**************************************************");
-    //     this.newLine();
-    //     for (let i: number = 0; i < this.failedSpecs.length; i++) {
-    //         this.failedSummary(this.failedSpecs[i], i + 1);
-    //         this.newLine();
-    //     }
-    //     this.newLine();
-    //     this.resetIndent();
-    // }
-
-    // private failedSummary(spec: CustomReporterResult, index: number): void {
-    //     this.log(`${index}) ${spec.fullName}`);
-    //     if (this.configuration.summary.displayErrorMessages) {
-    //         this.increaseIndent();
-    //         this.process(
-    //             spec,
-    //             (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: String): String => {
-    //                 return displayProcessor.displaySummaryErrorMessages(object, log);
-    //             }
-    //         );
-    //         this.decreaseIndent();
-    //     }
-    // }
-
-    // private pendingsSummary(): void {
-    //     this.log("**************************************************");
-    //     this.log("*                    Pending                     *");
-    //     this.log("**************************************************");
-    //     this.newLine();
-    //     for (let i: number = 0; i < this.pendingSpecs.length; i++) {
-    //         this.pendingSummary(this.pendingSpecs[i], i + 1);
-    //         this.newLine();
-    //     }
-    //     this.newLine();
-    //     this.resetIndent();
-    // }
-
-    // private pendingSummary(spec: CustomReporterResult, index: number) {
-    //     this.log(`${index}) ${spec.fullName}`);
-    //     this.increaseIndent();
-    //     const pendingReason = spec.pendingReason ? spec.pendingReason : "No reason given";
-    //     this.log(pendingReason.pending);
-    //     this.resetIndent();
-    // }
-
     private ensureSuiteDisplayed(): void {
         if (this.suiteHierarchy.length !== 0) {
             for (let i: number = this.suiteHierarchyDisplayed.length; i < this.suiteHierarchy.length; i++) {
@@ -314,9 +237,6 @@ export class ExecutionDisplay {
     }
 
     private log(stuff: String): void {
-        stuff.split("\n").forEach((line: String) => {
-            console.log(line !== "" ? this.currentIndent + line : line);
-        });
         fs.appendFileSync(
           this.configuration.destination.folder + this.configuration.destination.fileName,
           stuff
@@ -345,25 +265,27 @@ export class ExecutionDisplay {
 
     private prepareDestination() {
       const destFolder = this.configuration.destination.folder;
-      // const destFilename = this.configuration.destination.folder
-      //   + this.configuration.destination.fileName;
-      if (fs.accessSync(destFolder)) {
-        fs.mkdir(destFolder);
-      }
-      // fs.open(destFilename, "w", (err, fd) => {
-      //   if (err) { // exists delete it
-      //     fs.unlink(destFilename);
-      //   }
-      // });
-      // cleanup folder
+      fs.mkdir(destFolder, function(err) {
+        if (err) {
+          console.log(`Destination folder: ${destFolder} already exists`);
+        }
+      });
       const files = fs.readdirSync(destFolder);
       files.forEach(file => {
           fs.unlink(destFolder + file);
       });
       fs.createReadStream(`${__dirname}/assets/reports.css`)
-        .pipe(fs.createWriteStream(`${destFolder}/reports.css`));
+        .pipe(fs.createWriteStream(`${destFolder}${path.sep}reports.css`));
       fs.createReadStream(`${__dirname}/assets/scripts.js`)
-        .pipe(fs.createWriteStream(`${destFolder}/scripts.js`));
+        .pipe(fs.createWriteStream(`${destFolder}${path.sep}scripts.js`));
+
+      // import css from configuration.importStylesheets
+      this.configuration.importStylesheets.forEach(function(sPath) {
+        const fileName = sPath.substr(sPath.lastIndexOf(path.sep) + 1);
+        if (fileName) {
+          fs.createReadStream(sPath).pipe(fs.createWriteStream(`${destFolder}${path.sep}${fileName}`));
+        }
+      });
     }
 
 }

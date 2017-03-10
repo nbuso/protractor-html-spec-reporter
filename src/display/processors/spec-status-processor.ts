@@ -9,10 +9,9 @@ export class SpecStatusProcessor extends DisplayProcessor {
 
         if (withErrorMessages) {
           const errorId = `error-${spec.id}`;
-          console.log("Concatenating html error message");
           toReturn += `<a class="error-link" onclick="showHide('${errorId}')">${status.toUpperCase()}</a>
             <div id="${errorId}" class="hide">
-            <code>${this.getErrorMessages(spec)}<code>
+            ${this.getErrorMessages(spec)}
             </div>
           `;
         } else {
@@ -33,11 +32,10 @@ export class SpecStatusProcessor extends DisplayProcessor {
 
     private getErrorMessages(spec: CustomReporterResult): String {
       const logs: String[] = [];
-      console.log("Genereting error message");
       for (let i: number = 0; i < spec.failedExpectations.length; i++) {
-        logs.push("- ".failed + spec.failedExpectations[i].message.failed);
+        logs.push(`<pre class="error-message">${spec.failedExpectations[i].message}</pre>`);
         if (spec.failedExpectations[i].stack) {
-          logs.push(this.configuration.stacktrace.filter(spec.failedExpectations[i].stack));
+          logs.push(`<pre class="error-stack">${this.configuration.stacktrace.filter(spec.failedExpectations[i].stack)}</pre>`);
         }
       }
       return logs.join("\n");

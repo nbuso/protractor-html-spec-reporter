@@ -5,24 +5,14 @@ export class ConfigurationParser {
         return ConfigurationParser.merge(ConfigurationParser.defaultConfiguration, conf);
     }
 
-    private static isWindows: boolean = process && process.platform === "win32";
     private static defaultConfiguration: Configuration = {
-        colors: {
-            enabled: true,
-            failed: "red",
-            pending: "yellow",
-            successful: "green",
-        },
         customProcessors: [],
+        customStylesheets: [],
         destination: {
           fileName: "reports.html",
           folder: "target/html-report/"
         },
-        prefixes: {
-            failed: ConfigurationParser.isWindows ? "\u00D7 " : "✗ ",
-            pending: "* ",
-            successful: ConfigurationParser.isWindows ? "\u221A " : "✓ ",
-        },
+        importStylesheets: [],
         spec: {
             displayDuration: true,
             displayErrorMessages: true,
@@ -54,6 +44,7 @@ export class ConfigurationParser {
             displayStacktrace: false,
             displaySuccessful: false,
         },
+        title: "TDD Tests report"
     };
 
     private static merge(template: any, override: any): Configuration {

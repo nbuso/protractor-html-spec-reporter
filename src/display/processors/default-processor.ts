@@ -3,15 +3,15 @@ import { DisplayProcessor } from "../display-processor";
 
 export class DefaultProcessor extends DisplayProcessor {
     private static displaySpecDescription(spec: CustomReporterResult): String {
-        return spec.description;
+        return `${spec.description}`;
     }
 
     public displayJasmineStarted(): String {
-        return "Spec started";
+        return "";
     }
 
     public displaySuite(suite: CustomReporterResult): String {
-        return suite.description;
+        return `${suite.description}`;
     }
 
     public displaySuccessfulSpec(spec: CustomReporterResult): String {
