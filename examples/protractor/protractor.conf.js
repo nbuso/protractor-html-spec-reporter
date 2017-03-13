@@ -1,4 +1,4 @@
-let SpecReporter = require('jasmine-spec-reporter').SpecReporter;
+let SpecReporter = require('protractor-html-spec-reporter').SpecReporter;
 // https://github.com/angular/protractor/issues/1451
 require('protractor/built/logger').Logger.logLevel = 1;
 
@@ -27,7 +27,8 @@ exports.config = {
       },
       summary: {
         displayDuration: false
-      }
+      },
+      testLog: true
     }));
   }
 };

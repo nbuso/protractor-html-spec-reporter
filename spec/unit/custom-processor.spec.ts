@@ -8,7 +8,8 @@ describe("spec reporter", () => {
                 customProcessors: [global.TestProcessor],
                 spec: {
                     displayPending: true
-                }
+                },
+                testLog: true
             });
         });
 
@@ -20,7 +21,7 @@ describe("spec reporter", () => {
                             this.passed();
                         });
                     });
-                }).outputs).contains(/Spec started TEST/);
+                }).outputs).contains(/successful spec TEST/);
             });
         });
 
@@ -38,17 +39,15 @@ describe("spec reporter", () => {
 
         describe("when spec started", () => {
             it("should report start", () => {
-                expect(new Test(this.reporter, function()  {
+                const outputs = new Test(this.reporter, function()  {
                     this.describe("suite", () => {
                         this.it("spec to be started", () => {
                             this.passed();
                         });
                     });
-                }).outputs).contains([
-                    "  suite TEST",
-                    "    spec to be started TEST",
-                    "    ✓ spec to be started TEST"
-                ]);
+                }).outputs;
+                expect(outputs).contains(/spec to be started TEST/);
+                expect(outputs).contains(/suite TEST/);
             });
         });
 
@@ -74,13 +73,15 @@ describe("spec reporter", () => {
             });
 
             it("should display spec error messages with custom display", () => {
-                expect(new Test(this.reporter, function()  {
+                const outputs = new Test(this.reporter, function()  {
                     this.describe("suite", () => {
                         this.it("failed spec", () => {
                             this.failed();
                         });
                     });
-                }).outputs).contains(["      - Expected true to be false. TEST"]);
+                }).outputs;
+                expect(outputs).contains([/Expected true to be false\./]);
+                expect(outputs).contains([/TEST/]);
             });
 
             it("should report pending with custom display", () => {
@@ -91,18 +92,6 @@ describe("spec reporter", () => {
                         });
                     });
                 }).outputs).contains(/pending spec TEST/);
-            });
-        });
-
-        describe("when summary", () => {
-            it("should display summary error messages with custom display", () => {
-                expect(new Test(this.reporter, function()  {
-                    this.describe("suite", () => {
-                        this.it("failed spec", () => {
-                            this.failed();
-                        });
-                    });
-                }).summary).contains(["  - Expected true to be false. TEST"]);
             });
         });
     });

@@ -12,7 +12,7 @@
   "dependencies": {
     "@types/jasmine": "file:../../node_modules/@types/jasmine",
     "jasmine": "file:../../node_modules/jasmine",
-    "jasmine-spec-reporter": "file:../../",
+    "protractor-html-spec-reporter": "file:../../",
     "typescript": "file:../../node_modules/typescript"
   }
 }

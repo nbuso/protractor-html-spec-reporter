@@ -3,35 +3,24 @@ import { CustomReporterResult } from "./custom-reporter-result";
 import { DisplayProcessor } from "./display/display-processor";
 import { DefaultProcessor } from "./display/processors/default-processor";
 import { HtmlProcessor } from "./display/processors/html-processor";
-// import { SpecColorsProcessor } from "./display/processors/spec-colors-processor";
-import { SpecDurationsProcessor } from "./display/processors/spec-durations-processor";
-import { SpecStatusProcessor } from "./display/processors/spec-status-processor";
-// import { SpecPrefixesProcessor } from "./display/processors/spec-prefixes-processor";
 import { SuiteNumberingProcessor } from "./display/processors/suite-numbering-processor";
 import { SummaryProcessor } from "./display/processors/summary-processor";
 import { ExecutionMetrics } from "./execution-metrics";
 import SuiteInfo = jasmine.SuiteInfo;
 import RunDetails = jasmine.RunDetails;
 import fs = require("fs");
+import mkdirp = require("mkdirp");
 import path = require("path");
 
 type ProcessFunction = (displayProcessor: DisplayProcessor, object: ProcessObject,
-    log: String, metrics: ExecutionMetrics) => String;
+    log: string, metrics: ExecutionMetrics) => string;
 type ProcessObject = SuiteInfo | CustomReporterResult | RunDetails;
 
 export class ExecutionDisplay {
     private static initProcessors(configuration: Configuration): DisplayProcessor[] {
         const displayProcessors: DisplayProcessor[] = [
             new DefaultProcessor(configuration),
-            // new SpecPrefixesProcessor(configuration),
-            // new SpecColorsProcessor(configuration),
-
         ];
-
-        if (configuration.spec.displayDuration) {
-            displayProcessors.push(new SpecDurationsProcessor(configuration));
-        }
-        displayProcessors.push(new SpecStatusProcessor(configuration));
 
         if (configuration.suite.displayNumber) {
             displayProcessors.push(new SuiteNumberingProcessor(configuration));
@@ -74,14 +63,13 @@ export class ExecutionDisplay {
     private displayProcessors: DisplayProcessor[];
 
     constructor(private configuration: Configuration) {
+        this.prepareDestination();
         this.displayProcessors = ExecutionDisplay.initProcessors(this.configuration);
         this.hasCustomDisplaySpecStarted = ExecutionDisplay.hasCustomDisplaySpecStarted(this.displayProcessors);
-        this.prepareDestination();
     }
 
     public jasmineStarted(suiteInfo: SuiteInfo): void {
-      console.log(`jasmineStarted(): suiteInfo => ${JSON.stringify(suiteInfo)}`);
-        this.process(suiteInfo, (displayProcessor: DisplayProcessor, object: SuiteInfo, log: String): String => {
+        this.process(suiteInfo, (displayProcessor: DisplayProcessor, object: SuiteInfo, log: string): string => {
             return displayProcessor.displayJasmineStarted(object, log);
         });
     }
@@ -90,8 +78,8 @@ export class ExecutionDisplay {
 
         this.process(
             runDetails,
-            (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: String,
-              metricsObject: ExecutionMetrics): String => {
+            (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: string,
+              metricsObject: ExecutionMetrics): string => {
 
                 return displayProcessor.displaySummary(object, log, metricsObject);
             },
@@ -100,7 +88,7 @@ export class ExecutionDisplay {
 
         this.process(
           runDetails,
-          (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: String): String => {
+          (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: string): string => {
             return displayProcessor.displayJasmineDone(object, log);
           }
         );
@@ -115,7 +103,7 @@ export class ExecutionDisplay {
             this.ensureSuiteDisplayed();
             this.process(
                 result,
-                (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: String): String => {
+                (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: string): string => {
                     return displayProcessor.displaySpecStarted(object, log);
                 }
             );
@@ -125,7 +113,7 @@ export class ExecutionDisplay {
     public specDone(result: CustomReporterResult): void {
       this.process(
           result,
-          (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: String): String => {
+          (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: string): string => {
               return displayProcessor.displaySpecDone(object, log);
           }
       );
@@ -137,7 +125,7 @@ export class ExecutionDisplay {
             this.ensureSuiteDisplayed();
             this.process(
                 result,
-                (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: String): String => {
+                (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: string): string => {
                     return displayProcessor.displaySuccessfulSpec(object, log);
                 }
             );
@@ -150,7 +138,7 @@ export class ExecutionDisplay {
             this.ensureSuiteDisplayed();
             this.process(
                 result,
-                (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: String): String => {
+                (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: string): string => {
                     return displayProcessor.displayFailedSpec(object, log);
                 }
             );
@@ -158,7 +146,7 @@ export class ExecutionDisplay {
                 this.increaseIndent();
                 this.process(
                     result,
-                    (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: String): String => {
+                    (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: string): string => {
                         return displayProcessor.displaySpecErrorMessages(object, log);
                     }
                 );
@@ -173,7 +161,7 @@ export class ExecutionDisplay {
             this.ensureSuiteDisplayed();
             this.process(
                 result,
-                (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: String): String => {
+                (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: string): string => {
                     return displayProcessor.displayPendingSpec(object, log);
                 }
             );
@@ -189,8 +177,12 @@ export class ExecutionDisplay {
         if (this.suiteHierarchyDisplayed[this.suiteHierarchyDisplayed.length - 1] === suite) {
             this.suiteHierarchyDisplayed.pop();
         }
-        this.newLine();
-        this.decreaseIndent();
+        this.process(
+            suite,
+            (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: string): string => {
+                return displayProcessor.displaySuiteDone(object, log);
+            }
+        );
     }
 
     private ensureSuiteDisplayed(): void {
@@ -213,16 +205,15 @@ export class ExecutionDisplay {
     }
 
     private displaySuite(suite: CustomReporterResult): void {
-        this.newLine();
         this.computeSuiteIndent();
-        this.process(suite, (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: String): String => {
+        this.process(suite, (displayProcessor: DisplayProcessor, object: CustomReporterResult, log: string): string => {
             return displayProcessor.displaySuite(object, log);
         });
         this.increaseIndent();
     }
 
     private process(object: ProcessObject, processFunction: ProcessFunction, metrics?: ExecutionMetrics): void {
-        let log: String = "";
+        let log: string = "";
         this.displayProcessors.forEach((displayProcessor: DisplayProcessor) => {
             log = processFunction(displayProcessor, object, log, metrics);
         });
@@ -236,19 +227,17 @@ export class ExecutionDisplay {
         }
     }
 
-    private log(stuff: String): void {
-        fs.appendFileSync(
-          this.configuration.destination.folder + this.configuration.destination.fileName,
-          stuff
-        );
-        this.lastWasNewLine = false;
-    }
-
-    private newLine(): void {
-        if (!this.lastWasNewLine) {
-            console.log("");
-            this.lastWasNewLine = true;
-        }
+    private log(stuff: string): void {
+      if (this.configuration.testLog) {
+        stuff.split("\n").forEach((line: string) => {
+          console.log(line !== "" ? this.currentIndent + line : line);
+        });
+      }
+      fs.appendFileSync(
+        this.configuration.destination.folder + this.configuration.destination.fileName,
+        stuff
+      );
+      this.lastWasNewLine = false;
     }
 
     private resetIndent(): void {
@@ -264,16 +253,22 @@ export class ExecutionDisplay {
     }
 
     private prepareDestination() {
+      // note: ***sync*** everything otherwise other operation will find the destination folder not prepared
+      // as expected
       const destFolder = this.configuration.destination.folder;
-      fs.mkdir(destFolder, function(err) {
-        if (err) {
-          console.log(`Destination folder: ${destFolder} already exists`);
-        }
-      });
-      const files = fs.readdirSync(destFolder);
-      files.forEach(file => {
-          fs.unlink(destFolder + file);
-      });
+      try {
+        fs.statSync(destFolder); // thows error if not exists
+
+        // the folder exsits, clean it
+        const files = fs.readdirSync(destFolder);
+        files.forEach(file => {
+          this.debugLog(`Unliking file: ${file}`);
+          fs.unlinkSync(destFolder + file);
+        });
+      } catch (error) {
+        // the folder does not exist
+        mkdirp.sync(destFolder);
+      }
       fs.createReadStream(`${__dirname}/assets/reports.css`)
         .pipe(fs.createWriteStream(`${destFolder}${path.sep}reports.css`));
       fs.createReadStream(`${__dirname}/assets/scripts.js`)
@@ -288,4 +283,9 @@ export class ExecutionDisplay {
       });
     }
 
+    private debugLog(msg: string): void {
+      if (this.configuration.debug) {
+        console.log(msg);
+      }
+    }
 }

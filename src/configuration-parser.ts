@@ -8,6 +8,7 @@ export class ConfigurationParser {
     private static defaultConfiguration: Configuration = {
         customProcessors: [],
         customStylesheets: [],
+        debug: false,
         destination: {
           fileName: "reports.html",
           folder: "target/html-report/"
@@ -20,6 +21,7 @@ export class ConfigurationParser {
             displayPending: false,
             displayStacktrace: false,
             displaySuccessful: true,
+            takeScreenshot: true
         },
         stacktrace: {
             filter: stacktrace => {
@@ -44,6 +46,7 @@ export class ConfigurationParser {
             displayStacktrace: false,
             displaySuccessful: false,
         },
+        testLog: false,
         title: "TDD Tests report"
     };
 

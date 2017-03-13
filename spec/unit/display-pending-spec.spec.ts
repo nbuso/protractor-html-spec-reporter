@@ -3,7 +3,8 @@ describe("with pending spec enabled", () => {
         this.reporter = new global.SpecReporter({
             spec: {
                 displayPending: true
-            }
+            },
+            testLog: true
         });
     });
 
@@ -15,7 +16,7 @@ describe("with pending spec enabled", () => {
                         this.passed();
                     });
                 });
-            }).outputs).contains(/\* pending spec/);
+            }).outputs).contains(/.*?pending spec.*?/);
         });
     });
 });

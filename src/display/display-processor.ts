@@ -1,6 +1,6 @@
 import { Configuration } from "../configuration";
 import { CustomReporterResult } from "../custom-reporter-result";
-import { ExecutionMetrics } from '../execution-metrics';
+import { ExecutionMetrics } from "../execution-metrics";
 import SuiteInfo = jasmine.SuiteInfo;
 
 export class DisplayProcessor {
@@ -10,47 +10,51 @@ export class DisplayProcessor {
         this.configuration = configuration;
     }
 
-    public displayJasmineStarted(info?: SuiteInfo, log?: String): String {
+    public displayJasmineStarted(info?: SuiteInfo, log?: string): string {
         return log;
     }
 
-    public displaySuite(suite: CustomReporterResult, log: String): String {
+    public displaySuite(suite: CustomReporterResult, log: string): string {
         return log;
     }
 
-    public displaySpecStarted(spec: CustomReporterResult, log: String): String {
-        return log;
-    }
-
-    public displaySpecDone(spec: CustomReporterResult, log: String): String {
+    public displaySuiteDone(suite: CustomReporterResult, log: string): string {
       return log;
     }
 
-    public displaySuccessfulSpec(spec: CustomReporterResult, log: String): String {
+    public displaySpecStarted(spec: CustomReporterResult, log: string): string {
         return log;
     }
 
-    public displayFailedSpec(spec: CustomReporterResult, log: String): String {
-        return log;
-    }
-
-    public displaySpecErrorMessages(spec: CustomReporterResult, log: String): String {
-        return log;
-    }
-
-    public displaySummaryErrorMessages(spec: CustomReporterResult, log: String): String {
-        return log;
-    }
-
-    public displayPendingSpec(spec: CustomReporterResult, log: String): String {
-        return log;
-    }
-
-    public displaySummary(spec: CustomReporterResult, log: String, metrics: ExecutionMetrics): String {
+    public displaySpecDone(spec: CustomReporterResult, log: string): string {
       return log;
     }
 
-    public displayJasmineDone(spec: CustomReporterResult, log: String): String {
+    public displaySuccessfulSpec(spec: CustomReporterResult, log: string): string {
+        return log;
+    }
+
+    public displayFailedSpec(spec: CustomReporterResult, log: string): string {
+        return log;
+    }
+
+    public displaySpecErrorMessages(spec: CustomReporterResult, log: string): string {
+        return log;
+    }
+
+    public displaySummaryErrorMessages(spec: CustomReporterResult, log: string): string {
+        return log;
+    }
+
+    public displayPendingSpec(spec: CustomReporterResult, log: string): string {
+        return log;
+    }
+
+    public displaySummary(spec: CustomReporterResult, log: string, metrics: ExecutionMetrics): string {
+      return log;
+    }
+
+    public displayJasmineDone(spec: CustomReporterResult, log: string): string {
       return log;
     }
 }

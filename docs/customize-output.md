@@ -1,22 +1,46 @@
 Output customization
 ====================
 
-If you want to add extra information to the reporter output, you can build your own display processor and add it to options in the customProcessors array.
+The reporter output is based on html tables:
+* Main table with suites/specs execution status
+* Summary table providing of counting of executed specs
 
-# Example
-
-Let's say that you want to add the current time before each output of the reporter in order to have something like this:
-
-    Spec started
-
-      10:40:12 - first suite
-        10:40:12 - ✓ should be ok
-        10:40:21 - ✗ should failed
-          - Expected true to be false.
-        10:40:35 - ✓ should be ok
+You can customize the output importing or referencing your own css files.
 
 
-## Build your display processor
+## Import css files
+Configure css files with a relative path in your project that will be imported in the report destination folder;
+
+```javascript
+    onPrepare: function() {
+      jasmine.getEnv().addReporter(new HtmlSpecReporter.SpecReporter({
+        importStylesheets: [
+          "e2e/report/my-report-styles.css"
+        ]
+      }));
+```
+
+## Reference css files
+Configure css urls that will be linked in the resulting html reporter:
+
+```javascript
+    onPrepare: function() {
+      jasmine.getEnv().addReporter(new HtmlSpecReporter.SpecReporter({
+        customStylesheets: [
+          "http://my-website/somepath/my-report-styles.css",
+        ],
+      }));
+```
+
+
+## Build your display processor (no supported)
+
+__
+NOTE: This project derive from "jasmine-spec-reporter" as such it's inheriting the concept
+of CustomDisplayProcessor, but it's not supported because has the possibility to invalidate
+the html report generated.
+__
+
 
 You need to require the display processor:
 

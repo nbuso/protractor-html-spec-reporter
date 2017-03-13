@@ -3,7 +3,8 @@ describe("with spec error messages disabled", () => {
         this.reporter = new global.SpecReporter({
             spec: {
                 displayErrorMessages: false
-            }
+            },
+            testLog: true
         });
     });
 
@@ -14,7 +15,7 @@ describe("with spec error messages disabled", () => {
                     this.failed();
                 });
             });
-        }).outputs).not.contains(/Expected true to be false/);
+        }).outputs).not.contains(/.*?Expected true to be false.*?/);
     });
 });
 
@@ -23,7 +24,8 @@ describe("with summary error messages disabled", () => {
         this.reporter = new global.SpecReporter({
             summary: {
                 displayErrorMessages: false
-            }
+            },
+            testLog: true
         });
     });
 
@@ -34,6 +36,6 @@ describe("with summary error messages disabled", () => {
                     this.failed();
                 });
             });
-        }).summary).not.contains(/Expected true to be false/);
+        }).summary).not.contains(/.*?Expected true to be false\.*?/);
     });
 });

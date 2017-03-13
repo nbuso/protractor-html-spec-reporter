@@ -41,12 +41,17 @@ export class Configuration {
          * display each spec duration
          */
         displayDuration?: boolean;
+
+        /**
+         * get a screenshot from the browser
+         */
+        takeScreenshot?: boolean;
     };
     public stacktrace?: {
         /**
          * Customize stacktrace filtering
          */
-        filter?(stacktrace: String): String;
+        filter?(stacktrace: string): string;
     };
     public summary?: {
         /**
@@ -102,4 +107,14 @@ export class Configuration {
      * and added to the html
      */
     public importStylesheets?: string[];
+
+    /**
+     * Output also on console to permit test to verify the report
+     */
+    public testLog?: boolean;
+
+    /**
+     * Output additional information for debug purposes. (NOT USED YET)
+     */
+    public debug?: boolean;
 }

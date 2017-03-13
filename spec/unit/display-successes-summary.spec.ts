@@ -3,7 +3,8 @@ describe("with successes summary enabled", () => {
         this.reporter = new global.SpecReporter({
             summary: {
                 displaySuccessful: true
-            }
+            },
+            testLog: true
         });
     });
 
@@ -15,7 +16,7 @@ describe("with successes summary enabled", () => {
                         this.passed();
                     });
                 });
-            }).summary).contains(/Successes/);
+            }).summary).contains(/Success/);
         });
     });
 });

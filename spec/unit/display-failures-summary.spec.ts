@@ -3,7 +3,8 @@ describe("with failures summary disabled", () => {
         this.reporter = new global.SpecReporter({
             summary: {
                 displayFailed: false
-            }
+            },
+            testLog: true
         });
     });
 
@@ -20,7 +21,7 @@ describe("with failures summary disabled", () => {
                         });
                     });
                 });
-            }).summary).not.contains(/Failures/);
+            }).summary).not.contains(/.*?Failures.*?/);
         });
     });
 });

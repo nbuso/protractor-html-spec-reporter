@@ -77,7 +77,7 @@ class Test {
             if (!withColor) {
                 stuff = stuff.stripColors.stripTime();
             }
-            if (/^(Executed|\*\*\*\*\*\*\*)/.test(stuff)) {
+            if (/id=\"summary-table\"/.test(stuff)) {
                 logInSummary = true;
             }
             if (!logInSummary) {

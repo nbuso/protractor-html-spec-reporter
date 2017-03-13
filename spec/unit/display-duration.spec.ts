@@ -3,29 +3,34 @@ describe("with spec duration enabled", () => {
         this.reporter = new global.SpecReporter({
             spec: {
                 displayDuration: true
-            }
+            },
+            testLog: true
         });
     });
 
     describe("when spec", () => {
         it("should report success", () => {
-            expect(new Test(this.reporter, function() {
+            const outputs = new Test(this.reporter, function() {
                 this.describe("suite", () => {
                     this.it("successful spec", () => {
                         this.passed();
                     });
                 });
-            }).outputs).contains(/✓ successful spec \({time}\)/);
+            }).outputs;
+            expect(outputs).contains(/successful spec/);
+            expect(outputs).contains(/class=\"duration\"/);
         });
 
         it("should report failure", () => {
-            expect(new Test(this.reporter, function() {
+            const outputs = new Test(this.reporter, function() {
                 this.describe("suite", () => {
                     this.it("failed spec", () => {
                         this.failed();
                     });
                 });
-            }).outputs).contains(/✗ failed spec \({time}\)/);
+            }).outputs;
+            expect(outputs).contains(/failed spec/);
+            expect(outputs).contains(/class=\"duration\"/);
         });
     });
 });
@@ -35,19 +40,22 @@ describe("with summary duration disabled", () => {
         this.reporter = new global.SpecReporter({
             summary: {
                 displayDuration: false
-            }
+            },
+            testLog: true
         });
     });
 
     describe("when summary", () => {
         it("should not display execution duration", () => {
-            expect(new Test(this.reporter, function() {
+            const summary = new Test(this.reporter, function() {
                 this.describe("suite", () => {
                     this.it("successful spec", () => {
                         this.passed();
                     });
                 });
-            }).summary).contains("Executed 1 of 1 spec SUCCESS.");
+            }).summary;
+            expect(summary).contains(/Executed.*?1/);
+            expect(summary).contains(/Success.*?1/);
         });
     });
 });

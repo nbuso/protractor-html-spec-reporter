@@ -5,7 +5,8 @@ describe("spec reporter", () => {
                 customProcessors: [global.DisplayProcessor],
                 spec: {
                     displayPending: true
-                }
+                },
+                testLog: true
             });
         });
 
@@ -17,7 +18,7 @@ describe("spec reporter", () => {
                             this.passed();
                         });
                     });
-                }).outputs).contains(/Spec started/);
+                }).outputs).contains(/class=\"spec\"/);
             });
         });
 
@@ -35,16 +36,15 @@ describe("spec reporter", () => {
 
         describe("when spec started", () => {
             it("should not report start", () => {
-                expect(new Test(this.reporter, function()  {
+                const outputs = new Test(this.reporter, function()  {
                     this.describe("suite", () => {
                         this.it("spec to be started", () => {
                             this.passed();
                         });
                     });
-                }).outputs).contains([
-                    "  suite",
-                    "    ✓ spec to be started"
-                ]);
+                }).outputs;
+                expect(outputs).contains([/suite/]);
+                expect(outputs).contains([/spec to be started/]);
             });
         });
 
@@ -76,7 +76,7 @@ describe("spec reporter", () => {
                             this.failed();
                         });
                     });
-                }).outputs).contains(["      - Expected true to be false."]);
+                }).outputs).contains([/Expected true to be false\./]);
             });
 
             it("should report pending", () => {
@@ -90,16 +90,5 @@ describe("spec reporter", () => {
             });
         });
 
-        describe("when summary", () => {
-            it("should display summary error messages", () => {
-                expect(new Test(this.reporter, function()  {
-                    this.describe("suite", () => {
-                        this.it("failed spec", () => {
-                            this.failed();
-                        });
-                    });
-                }).summary).contains(["  - Expected true to be false."]);
-            });
-        });
     });
 });

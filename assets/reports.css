@@ -9,25 +9,31 @@ table caption {
     background-color: #59ffff
 }
 
-table thead, table thead:hover {
-    background-color: #ffe79e
-}
-
 tr {
     margin: 5px;
     border: 5px solid black !important;
+}
+
+tr.suite td {
+  border-top: 0.1em solid gray;
 }
 
 table td, table caption {
     padding: 0.4em;
 }
 
-table td.status-success {
+table td.status span {
+  border-radius: 0.3em;
+  padding: 0.4em;
+}
+
+table td.status span.status-success {
     background-color: #9dea9e
 }
 
-table td.status-failed {
+table td.status span.status-failed {
     background-color: #ff4a4a;
+
 }
 
 table tbody tr:hover td {

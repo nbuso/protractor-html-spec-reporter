@@ -9,6 +9,6 @@
   "license": "Apache-2.0",
   "dependencies": {
     "jasmine": "file:../../node_modules/jasmine",
-    "jasmine-spec-reporter": "file:../../"
+    "protractor-html-spec-reporter": "file:../../"
   }
 }
