@@ -1,18 +1,18 @@
 Use jasmine-spec-reporter with Protractor
 =========================================
-The `jasmine-spec-reporter` can be used to enhance your [Protractor](https://github.com/angular/protractor) tests execution report.
+The `protractor-html-spec-reporter` can be used to enhance your [Protractor](https://github.com/angular/protractor) tests execution report.
 
 ## Protractor configuration
 In your Protractor configuration file:
 
 ```javascript
-let SpecReporter = require('jasmine-spec-reporter').SpecReporter;
+let HtmlSpecReporter = require('protractor-html-spec-reporter').HtmlSpecReporter;
 
 exports.config = {
    // your config here ...
 
   onPrepare: function () {
-    jasmine.getEnv().addReporter(new SpecReporter({
+    jasmine.getEnv().addReporter(new HtmlSpecReporter({
       spec: {
         displayStacktrace: true
       }

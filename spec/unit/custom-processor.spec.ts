@@ -1,7 +1,7 @@
 describe("spec reporter", () => {
     describe("with custom processor", () => {
         beforeEach(() => {
-            this.reporter = new global.SpecReporter({
+            this.reporter = new global.HtmlSpecReporter({
                 customOptions: {
                     test: " TEST"
                 },

@@ -1,7 +1,7 @@
 describe("spec reporter", () => {
     describe("with display processor", () => {
         beforeEach(() => {
-            this.reporter = new global.SpecReporter({
+            this.reporter = new global.HtmlSpecReporter({
                 customProcessors: [global.DisplayProcessor],
                 spec: {
                     displayPending: true

@@ -1,4 +1,4 @@
-Use jasmine-spec-reporter with Node
+Use protractor-html-spec-reporter with Node
 ===================================
 The `jasmine-spec-reporter` can be used to enhance your
 [jasmine node](https://github.com/jasmine/jasmine-npm) tests execution report.
@@ -8,10 +8,10 @@ The `jasmine-spec-reporter` can be used to enhance your
 Create a `spec/helpers/reporter.js` file with the following content:
 
 ```javascript
-const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
+const HtmlSpecReporter = require('protractor-html-spec-reporter').HtmlSpecReporter;
 
 jasmine.getEnv().clearReporters();               // remove default reporter logs
-jasmine.getEnv().addReporter(new SpecReporter({  // add jasmine-spec-reporter
+jasmine.getEnv().addReporter(new HtmlSpecReporter({  // add jasmine-spec-reporter
   spec: {
     displayPending: true
   }

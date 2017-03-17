@@ -1,6 +1,6 @@
 describe("with default display", () => {
     beforeEach(() => {
-        this.reporter = new global.SpecReporter({
+        this.reporter = new global.HtmlSpecReporter({
           testLog: true
         });
     });

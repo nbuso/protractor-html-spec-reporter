@@ -1,6 +1,6 @@
 describe("with pending spec enabled", () => {
     beforeEach(() => {
-        this.reporter = new global.SpecReporter({
+        this.reporter = new global.HtmlSpecReporter({
             spec: {
                 displayPending: true
             },

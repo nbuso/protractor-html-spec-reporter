@@ -1,6 +1,6 @@
 describe("with successes summary enabled", () => {
     beforeEach(() => {
-        this.reporter = new global.SpecReporter({
+        this.reporter = new global.HtmlSpecReporter({
             summary: {
                 displaySuccessful: true
             },

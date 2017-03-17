@@ -1,4 +1,4 @@
-import { SpecReporter } from "protractor-html-spec-reporter";
+import { HtmlSpecReporter } from "protractor-html-spec-reporter";
 import { DisplayProcessor } from "protractor-html-spec-reporter";
 const Jasmine = require("jasmine");
 import SuiteInfo = jasmine.SuiteInfo;
@@ -11,8 +11,8 @@ class CustomProcessor extends DisplayProcessor {
 
 const jrunner = new Jasmine();
 jrunner.env.clearReporters();
-console.log(">>> Creating typescript example SpecReporter");
-jrunner.addReporter(new SpecReporter({
+console.log(">>> Creating typescript example HtmlSpecReporter");
+jrunner.addReporter(new HtmlSpecReporter({
     customProcessors: [CustomProcessor],
     testLog: true
 }));

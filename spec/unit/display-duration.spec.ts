@@ -1,6 +1,6 @@
 describe("with spec duration enabled", () => {
     beforeEach(() => {
-        this.reporter = new global.SpecReporter({
+        this.reporter = new global.HtmlSpecReporter({
             spec: {
                 displayDuration: true
             },
@@ -37,7 +37,7 @@ describe("with spec duration enabled", () => {
 
 describe("with summary duration disabled", () => {
     beforeEach(() => {
-        this.reporter = new global.SpecReporter({
+        this.reporter = new global.HtmlSpecReporter({
             summary: {
                 displayDuration: false
             },

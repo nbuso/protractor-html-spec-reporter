@@ -1,6 +1,6 @@
 describe("with failures summary disabled", () => {
     beforeEach(() => {
-        this.reporter = new global.SpecReporter({
+        this.reporter = new global.HtmlSpecReporter({
             summary: {
                 displayFailed: false
             },

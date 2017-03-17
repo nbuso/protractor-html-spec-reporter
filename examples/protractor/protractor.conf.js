@@ -1,4 +1,4 @@
-let SpecReporter = require('protractor-html-spec-reporter').SpecReporter;
+let HtmlSpecReporter = require('protractor-html-spec-reporter').HtmlSpecReporter;
 // https://github.com/angular/protractor/issues/1451
 require('protractor/built/logger').Logger.logLevel = 1;
 
@@ -21,7 +21,7 @@ exports.config = {
     }
   },
   onPrepare: function () {
-    jasmine.getEnv().addReporter(new SpecReporter({
+    jasmine.getEnv().addReporter(new HtmlSpecReporter({
       spec: {
         displayStacktrace: true
       },

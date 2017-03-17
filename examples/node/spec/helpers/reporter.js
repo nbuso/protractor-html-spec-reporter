@@ -1,7 +1,7 @@
-const SpecReporter = require('protractor-html-spec-reporter').SpecReporter;
+const HtmlSpecReporter = require('protractor-html-spec-reporter').HtmlSpecReporter;
 
 jasmine.getEnv().clearReporters();               // remove default reporter logs
-jasmine.getEnv().addReporter(new SpecReporter({  // add jasmine-spec-reporter
+jasmine.getEnv().addReporter(new HtmlSpecReporter({  // add jasmine-spec-reporter
   spec: {
     displayPending: true,
     displayDuration: false,

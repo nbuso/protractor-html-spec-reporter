@@ -7,7 +7,7 @@ import CustomReporter = jasmine.CustomReporter;
 import SuiteInfo = jasmine.SuiteInfo;
 import RunDetails = jasmine.RunDetails;
 
-export class SpecReporter implements CustomReporter {
+export class HtmlSpecReporter implements CustomReporter {
     private started: boolean = false;
     private finished: boolean = false;
     private display: ExecutionDisplay;

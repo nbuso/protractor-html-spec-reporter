@@ -3,7 +3,7 @@ describe("duration", () => {
         const secs = 1000;
         const mins = 60 * secs;
         const hours = 60 * mins;
-        this.reporter = new global.SpecReporter();
+        this.reporter = new global.HtmlSpecReporter();
         this.formatDuration = this.reporter.metrics.formatDuration;
         expect(this.formatDuration(0)).toBe("0 sec");
         expect(this.formatDuration(10)).toBe("0.01 sec");

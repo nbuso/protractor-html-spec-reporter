@@ -1,6 +1,6 @@
 describe("With spec display stacktrace enabled", () => {
     beforeEach(() => {
-        this.reporter = new global.SpecReporter({
+        this.reporter = new global.HtmlSpecReporter({
             spec: {
                 displayStacktrace: true
             },

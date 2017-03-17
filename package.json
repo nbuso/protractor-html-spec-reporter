@@ -31,7 +31,9 @@
     "reporter",
     "bdd",
     "spec",
-    "protractor"
+    "protractor",
+    "html",
+    "screenshot"
   ],
   "author": "Nicola Buso",
   "license": "Apache-2.0",

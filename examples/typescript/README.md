@@ -4,8 +4,8 @@ Use jasmine-spec-reporter with TypeScript
 ## Configuration
 
 ```typescript
-import { SpecReporter } from "jasmine-spec-reporter";
-import { DisplayProcessor } from "jasmine-spec-reporter";
+import { HtmlSpecReporter } from "protractor-html-spec-reporter";
+import { DisplayProcessor } from "protractor-html-spec-reporter";
 const Jasmine = require("jasmine");
 import SuiteInfo = jasmine.SuiteInfo;
 
@@ -17,7 +17,7 @@ class CustomProcessor extends DisplayProcessor {
 
 const jrunner = new Jasmine();
 jrunner.env.clearReporters();
-jrunner.addReporter(new SpecReporter({
+jrunner.addReporter(new HtmlSpecReporter({
     customProcessors: [CustomProcessor],
 }));
 jrunner.loadConfigFile();

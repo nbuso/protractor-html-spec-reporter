@@ -1,12 +1,12 @@
 declare namespace NodeJS {
     export interface Global {
-        SpecReporter;
+        HtmlSpecReporter;
         DisplayProcessor;
         TestProcessor;
     }
 }
 
-global.SpecReporter = require("../../built/main").SpecReporter;
+global.HtmlSpecReporter = require("../../built/main").HtmlSpecReporter;
 global.DisplayProcessor = require("../../built/main").DisplayProcessor;
 global.TestProcessor = require("./test-processor").TestProcessor;
 

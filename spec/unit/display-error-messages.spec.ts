@@ -1,6 +1,6 @@
 describe("with spec error messages disabled", () => {
     beforeEach(() => {
-        this.reporter = new global.SpecReporter({
+        this.reporter = new global.HtmlSpecReporter({
             spec: {
                 displayErrorMessages: false
             },
@@ -21,7 +21,7 @@ describe("with spec error messages disabled", () => {
 
 describe("with summary error messages disabled", () => {
     beforeEach(() => {
-        this.reporter = new global.SpecReporter({
+        this.reporter = new global.HtmlSpecReporter({
             summary: {
                 displayErrorMessages: false
             },
